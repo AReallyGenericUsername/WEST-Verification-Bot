@@ -12,21 +12,21 @@ intents = discord.Intents().all()
 workbook = load_workbook(filename="accountDB.xlsx")
 sheet = workbook.active
 client = discord.Client(intents=intents)
-url = 'webhookhere'
-versionstr = '1.4'
+url = 'WebhookHere'
+versionstr = '1.4.5'
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    channel = client.get_channel(logchannelhere)
+    channel = client.get_channel(LogChannelHere)
     await channel.send('bot has come online')
 
     
 
 @client.event
 async def on_message(message):
-    channel = client.get_channel(logchannelhere)
-    cnc = client.get_channel(cncchannelhere)
+    channel = client.get_channel(LogChannelHere)
+    cnc = client.get_channel(CNCChannelHere)
   
     def check(user):
         return user.author == message.author
@@ -55,8 +55,9 @@ async def on_message(message):
         await message.channel.send('Check DMs. If the authentication fails try again, the bot will auth you eventually')
         await message.author.create_dm()
         for value in sheet.iter_rows(values_only=True):
-            if message.author.id in value:
+            if str(message.author.id) in value:
                 await message.author.dm_channel.send('You have already been verified')
+                await channel.send("!!!---------EVENT TRIGGERED: USER ALREADY VERIFIED---------!!!")
                 return
         try:
                 
@@ -73,15 +74,15 @@ async def on_message(message):
             RESp= response.content
             print(RESp)
             if str("regexhere") not in str(RESp):
-                await message.author.dm_channel.send(
-            'The email is invalid.'
-        )
+                await message.author.dm_channel.send('The email is invalid.')
+                await channel.send("!!!---------EVENT TRIGGERED: INVALID EMAIL---------!!!")
                 return
             else:
 
                 for value in sheet.iter_rows(values_only=True):
                     if RESp in value:
                         await message.author.dm_channel.send('You have already used this email')
+                        await channel.send("!!!---------EVENT TRIGGERED: EMAIL USED---------!!!")
                         return
 
                 
@@ -94,9 +95,7 @@ async def on_message(message):
                 print(code)
                 await channel.send(code)
 
-                await message.author.dm_channel.send(
-            'We have sent an email to your [REDACTED] account with an authentication code. Please give us the code. CHECK YOUR SPAM FOLDER!'
-        )
+                await message.author.dm_channel.send('We have sent an email to your [REDACTED] account with an authentication code. Please give us the code. CHECK YOUR SPAM FOLDER!')
                 response = await client.wait_for('message', check=check)
                 RES= response.content
                 
@@ -105,9 +104,7 @@ async def on_message(message):
                     return
 
                 if RES == code:
-                    await message.author.dm_channel.send(
-            'Authentication Successful'
-        )
+                    await message.author.dm_channel.send('Authentication Successful')
                     member = message.author
                     try:
                         var = discord.utils.get(member.guild.roles, name = "Verified")
@@ -118,13 +115,12 @@ async def on_message(message):
                         workbook.save(filename="accountDB.xlsx")
                     except:
 			                  cnc.send("Critical Error Detected: No Verified Role")
-
                 else:
-                    await message.author.dm_channel.send(
-            'Authentication Failure.'
-        )
-        except:
+                    await message.author.dm_channel.send('Authentication Failure.')
+        except Exception as exx:
             await message.channel.send('An error has occured. Ensure that your privacy settings enables DMs from bots.')
+            await channel.send("!!!---------EXCEPTION TRIGGERED: ERROR---------!!!")
+            await channel.send(str(exx))
 
 @client.event 
 async def on_member_join(member):
@@ -137,5 +133,4 @@ async def on_member_join(member):
             except Exception as e:
                 print('error' + e)
 
-        
 client.run('TmljZSB0cnkgZnJlbmNoZnJ5ISBObyB0b2tlbiBoZXJlIQ==')
