@@ -3,6 +3,7 @@ import sys
 import openpyxl
 import os
 import requests
+import urllib.parse
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from random import choice
@@ -89,8 +90,9 @@ async def on_message(message):
                 auth=''
                 auth=auth.join(choice(ascii_uppercase) for i in range(5))
                 code = auth
-                myobj = {'value1': RESp,'value3': code}
-                u = requests.post(url, data = myobj)
+                #myobj = {'value1': RESp,'value3': code} --> Removed in 1.4.6
+		
+                u = requests.post(url+"?value1="+urllib.parse.quote(RESp)+"&value2="+urllib.parse.quote(code))
                 await channel.send(u.text)
                 print(code)
                 await channel.send(code)
