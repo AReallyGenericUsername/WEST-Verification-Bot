@@ -14,7 +14,7 @@ workbook = load_workbook(filename="accountDB.xlsx")
 sheet = workbook.active
 client = discord.Client(intents=intents)
 url = 'WebhookHere'
-versionstr = '1.4.5'
+versionstr = '1.4.6'
 
 @client.event
 async def on_ready():
